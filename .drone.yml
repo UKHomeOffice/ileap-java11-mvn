@@ -16,10 +16,10 @@ pipeline:
       - DOCKER_HOST=tcp://172.17.0.1:2375
     commands:
       - docker login -u="ukhomeofficedigital+ileap" -p=$${DOCKER_PASSWORD} quay.io
-      - docker tag docker-java11-mvn:$${DRONE_COMMIT_SHA} quay.io/ukhomeofficedigital/docker-java11-mvn:$${DRONE_COMMIT_SHA}
-      - docker tag docker-java11-mvn:$${DRONE_COMMIT_SHA} quay.io/ukhomeofficedigital/docker-java11-mvn:latest
-      - docker push quay.io/ukhomeofficedigital/docker-java11-mvn:$${DRONE_COMMIT_SHA}
-      - docker push quay.io/ukhomeofficedigital/docker-java11-mvn:latest
+      - docker tag ileap-java11-mvn:$${DRONE_COMMIT_SHA} quay.io/ukhomeofficedigital/ileap-java11-mvn:$${DRONE_COMMIT_SHA}
+      - docker tag ileap-java11-mvn:$${DRONE_COMMIT_SHA} quay.io/ukhomeofficedigital/ileap-java11-mvn:latest
+      - docker push quay.io/ukhomeofficedigital/ileap-java11-mvn:$${DRONE_COMMIT_SHA}
+      - docker push quay.io/ukhomeofficedigital/ileap-java11-mvn:latest
     when:
       event: push
       branch: master
@@ -32,7 +32,7 @@ pipeline:
       - DOCKER_HOST=tcp://172.17.0.1:2375
     commands:
       - docker login -u="ukhomeofficedigital+ileap" -p=$${DOCKER_PASSWORD} quay.io
-      - docker tag docker-java11-mvn:$${DRONE_COMMIT_SHA} quay.io/ukhomeofficedigital/docker-java11-mvn:$${DRONE_TAG}
-      - docker push quay.io/ukhomeofficedigital/docker-java11-mvn:$${DRONE_TAG}
+      - docker tag ileap-java11-mvn:$${DRONE_COMMIT_SHA} quay.io/ukhomeofficedigital/ileap-java11-mvn:$${DRONE_TAG}
+      - docker push quay.io/ukhomeofficedigital/ileap-java11-mvn:$${DRONE_TAG}
     when:
       event: tag
