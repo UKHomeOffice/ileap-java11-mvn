@@ -7,6 +7,7 @@ ENV ARTIFACTORY_USERNAME=${ART_USERNAME} \
     ARTIFACTORY_PASSWORD=${ART_PASSWORD}
 
 RUN mkdir -p /scripts
+RUN chmod  755 /root && chmod 755 /root/.bashrc
 
 RUN groupadd -r gap -g 1000 && useradd -u 1000 -r -g gap -m -d /build -s /sbin/nologin -c "GAP user" gap && \
     chmod 755 /build
