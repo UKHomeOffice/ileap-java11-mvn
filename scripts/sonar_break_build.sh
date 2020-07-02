@@ -36,7 +36,7 @@ then
 fi
 
 #While report is processed ANALYSIS_ID is not availabe and jq returns null
-ANALYSIS_ID=$(curl -XGET -s -u $SONAR_API_TOKEN: $SONAR_SERVER/api/ce/task\?id\=$CE_TASK_ID | $(pwd)/scripts/jq -r .task.analysisId)
+ANALYSIS_ID=$(curl -XGET -s -u $SONAR_API_TOKEN: $SONAR_SERVER/api/ce/task\?id\=$CE_TASK_ID | /scripts/jq -r .task.analysisId)
 I=1
 TIMEOUT=0
 while [ "$ANALYSIS_ID" == "null" ]
@@ -49,10 +49,10 @@ do
   sleep $I
   TIMEOUT=$((TIMEOUT+I))
   I=$((I+1))
-  ANALYSIS_ID=$(curl -XGET -s -u $SONAR_API_TOKEN: $SONAR_SERVER/api/ce/task\?id\=$CE_TASK_ID | $(pwd)/scripts/jq -r .task.analysisId)
+  ANALYSIS_ID=$(curl -XGET -s -u $SONAR_API_TOKEN: $SONAR_SERVER/api/ce/task\?id\=$CE_TASK_ID | /scripts/jq -r .task.analysisId)
 done
 
-STATUS=$(curl -XGET -s -u $SONAR_API_TOKEN: $SONAR_SERVER/api/qualitygates/project_status?analysisId=$ANALYSIS_ID | $(pwd)/scripts/jq -r .projectStatus.status)
+STATUS=$(curl -XGET -s -u $SONAR_API_TOKEN: $SONAR_SERVER/api/qualitygates/project_status?analysisId=$ANALYSIS_ID | /scripts/jq -r .projectStatus.status)
 
 if [ "$STATUS" == "ERROR" ]
 then
