@@ -1,15 +1,26 @@
 ### BUILD image
-FROM quay.io/ukhomeofficedigital/java11-mvn:11.0.5_10-mvn-3.6.3 as builder
+FROM quay.io/ukhomeofficedigital/ileap-java11:0.1.0 as builder
 ARG ART_USERNAME
 ARG ART_PASSWORD
 
 ENV ARTIFACTORY_USERNAME=${ART_USERNAME} \
     ARTIFACTORY_PASSWORD=${ART_PASSWORD}
 
-RUN mkdir -p /scripts
+ENV MVN_VERSION 3.8.1
 
-RUN groupadd -r gap -g 1000 && useradd -u 1000 -r -g gap -m -d /build -s /sbin/nologin -c "GAP user" gap && \
-    chmod 755 /build
+# Install Maven
+RUN apk add git
+RUN mkdir -p $HOME/.m2/ && \
+    wget https://apache.mirrors.nublue.co.uk/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz && \
+    tar xvzf apache-maven-${MVN_VERSION}-bin.tar.gz && \
+    mv apache-maven-${MVN_VERSION} /var/local/ && \
+    rm -- apache-maven-${MVN_VERSION}-bin.tar.gz && \
+    ln -s /var/local/apache-maven-${MVN_VERSION}/bin/mvnyjp /usr/local/bin/mvnyjp && \
+    ln -s /var/local/apache-maven-${MVN_VERSION}/bin/mvnDebug /usr/local/bin/mvnDebug && \
+    ln -s /var/local/apache-maven-${MVN_VERSION}/bin/mvn /usr/local/bin/mvn
 
-WORKDIR /scripts
-COPY ./scripts /scripts
+COPY settings.xml $HOME/.m2/
+
+ENTRYPOINT ["/bin/ash", "-c"]
+
+CMD ["mvn -v"]
