@@ -1,5 +1,9 @@
 ### BUILD image
-FROM quay.io/ukhomeofficedigital/ileap-java11:0.1.1 as builder
+FROM quay.io/ukhomeofficedigital/ileap-java11:1.0 as builder
+
+WORKDIR /scripts
+COPY ./scripts /scripts
+
 ARG ART_USERNAME
 ARG ART_PASSWORD
 
