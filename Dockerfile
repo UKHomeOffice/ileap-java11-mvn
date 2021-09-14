@@ -1,6 +1,8 @@
 ### BUILD image
 FROM quay.io/ukhomeofficedigital/ileap-java11:1.0 as builder
 
+RUN apk --no-cache add curl
+
 WORKDIR /scripts
 COPY ./scripts /scripts
 
