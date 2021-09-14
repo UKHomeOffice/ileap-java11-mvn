@@ -1,38 +1,57 @@
-pipeline:
-  build_docker_image:
-    image: docker:18.06.1-ce
-    environment:
-      - DOCKER_HOST=tcp://172.17.0.1:2375
-    commands:
-      - docker build -t ileap-java11-mvn:$${DRONE_COMMIT_SHA} .
-    when:
-      event: [push, tag]
+---
 
-  image_to_quay:
-    image: docker:18.06.1-ce
-    secrets:
-      - docker_password
-    environment:
-      - DOCKER_HOST=tcp://172.17.0.1:2375
-    commands:
-      - docker login -u="ukhomeofficedigital+ileapquay" -p=$${DOCKER_PASSWORD} quay.io
-      - docker tag ileap-java11-mvn:$${DRONE_COMMIT_SHA} quay.io/ukhomeofficedigital/ileap-java11-mvn:$${DRONE_COMMIT_SHA}
-      - docker tag ileap-java11-mvn:$${DRONE_COMMIT_SHA} quay.io/ukhomeofficedigital/ileap-java11-mvn:latest
-      - docker push quay.io/ukhomeofficedigital/ileap-java11-mvn:$${DRONE_COMMIT_SHA}
-      - docker push quay.io/ukhomeofficedigital/ileap-java11-mvn:latest
-    when:
-      event: push
-      branch: master
+kind: pipeline
+name: default
+type: kubernetes
 
-  tagged_image_to_quay:
-    image: docker:18.06.1-ce
-    secrets:
-      - docker_password
-    environment:
-      - DOCKER_HOST=tcp://172.17.0.1:2375
-    commands:
-      - docker login -u="ukhomeofficedigital+ileapquay" -p=$${DOCKER_PASSWORD} quay.io
-      - docker tag ileap-java11-mvn:$${DRONE_COMMIT_SHA} quay.io/ukhomeofficedigital/ileap-java11-mvn:$${DRONE_TAG}
-      - docker push quay.io/ukhomeofficedigital/ileap-java11-mvn:$${DRONE_TAG}
-    when:
-      event: tag
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: build_docker_image
+  pull: if-not-exists
+  image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+  commands:
+  - n=0; while [ "$n" -lt 60 ] && [ ! docker stats --no-stream ]; do n=$(( n + 1 )); sleep 1; done
+  - docker build -t ileap-java11-mvn:$${DRONE_COMMIT_SHA} .
+  when:
+    event:
+    - push
+    - tag
+
+- name: image_to_quay
+  pull: if-not-exists
+  image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+  commands:
+  - docker login -u="ukhomeofficedigital+ileapquay" -p=$${DOCKER_PASSWORD} quay.io
+  - docker tag ileap-java11-mvn:$${DRONE_COMMIT_SHA} quay.io/ukhomeofficedigital/ileap-java11-mvn:$${DRONE_COMMIT_SHA}
+  - docker tag ileap-java11-mvn:$${DRONE_COMMIT_SHA} quay.io/ukhomeofficedigital/ileap-java11-mvn:latest
+  - docker push quay.io/ukhomeofficedigital/ileap-java11-mvn:$${DRONE_COMMIT_SHA}
+  - docker push quay.io/ukhomeofficedigital/ileap-java11-mvn:latest
+  environment:
+    DOCKER_PASSWORD:
+      from_secret: docker_password
+  when:
+    branch:
+    - main
+    event:
+    - push
+
+- name: tagged_image_to_quay
+  pull: if-not-exists
+  image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind
+  commands:
+  - docker login -u="ukhomeofficedigital+ileapquay" -p=$${DOCKER_PASSWORD} quay.io
+  - docker tag ileap-java11-mvn:$${DRONE_COMMIT_SHA} quay.io/ukhomeofficedigital/ileap-java11-mvn:$${DRONE_TAG}
+  - docker push quay.io/ukhomeofficedigital/ileap-java11-mvn:$${DRONE_TAG}
+  environment:
+    DOCKER_PASSWORD:
+      from_secret: docker_password
+  when:
+    event:
+    - tag
+
+services:
+- name: docker
+  image: 340268328991.dkr.ecr.eu-west-2.amazonaws.com/acp/dind:latest
