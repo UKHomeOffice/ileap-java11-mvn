@@ -12,12 +12,12 @@ ARG ART_PASSWORD
 ENV ARTIFACTORY_USERNAME=${ART_USERNAME} \
     ARTIFACTORY_PASSWORD=${ART_PASSWORD}
 
-ENV MVN_VERSION 3.8.1
+ENV MVN_VERSION 3.8.8
 
 # Install Maven
 RUN apk add git
 RUN mkdir -p $HOME/.m2/ && \
-    wget https://apache.mirrors.nublue.co.uk/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz && \
+    wget https://dlcdn.apache.org/maven/maven-3/${MVN_VERSION}/binaries/apache-maven-${MVN_VERSION}-bin.tar.gz && \
     tar xvzf apache-maven-${MVN_VERSION}-bin.tar.gz && \
     mv apache-maven-${MVN_VERSION} /var/local/ && \
     rm -- apache-maven-${MVN_VERSION}-bin.tar.gz && \
